@@ -16,6 +16,14 @@ namespace DefaultCombat.Helpers.PvP
                 if (target == null)
                     return false;
 
+                var property = target.GetType().GetProperty("IsPlayer");
+                if (property != null && property.PropertyType == typeof(bool))
+                {
+                    var value = property.GetValue(target, null);
+                    if (value is bool && (bool)value)
+                        return true;
+                }
+
                 var typeName = target.GetType().Name;
                 return typeName.IndexOf("Player", StringComparison.OrdinalIgnoreCase) >= 0;
             }
@@ -70,14 +78,24 @@ namespace DefaultCombat.Helpers.PvP
 
         public static bool ShouldUseDefensive(int healthPercent, int threshold)
         {
+            var key = "defensive-" + threshold;
+
             if (!IsPvPContext)
+            {
+                PvPHumanizer.Reset(key);
                 return healthPercent <= threshold;
+            }
 
             if (healthPercent > threshold)
+            {
+                PvPHumanizer.Reset(key);
                 return false;
+            }
 
             var urgency = healthPercent <= 20 ? PvPReactionUrgency.Critical : PvPReactionUrgency.Important;
-            return PvPHumanizer.Ready("defensive-" + threshold, true, urgency);
+            var ready = PvPHumanizer.Ready(key, true, urgency);
+            LogDecision(ready ? "DEFENSIVE -> use: pressure confirmed" : "DEFENSIVE -> hold: reaction window");
+            return ready;
         }
 
         private static void LogDecision(string decision)
