@@ -15,7 +15,7 @@ using DefaultCombat.Helpers;
 namespace DefaultCombat.Routines
 {
     /// <summary>
-    ///     Juggernaut Vengeance (DoT melee dps) rotation: Shatter / Impale / Vengeful Slam /
+    ///     Juggernaut Vengeance (DoT melee dps) rotation: Shatter / Impale or Skewering Strike /
     ///     Force Scream on cooldown keep the bleeds at full uptime.
     /// </summary>
     public class Vengeance : RotationBase
@@ -53,6 +53,8 @@ namespace DefaultCombat.Routines
             get
             {
                 return new PrioritySelector(
+                    //Skewering Strike replaces Impale and doubles as a 10m gap closer.
+                    Spell.Cast("Skewering Strike"),
                     Spell.Cast("Force Charge", ret => CombatHotkeys.EnableCharge && Core.Player.Target.Distance >= 1f),
                     Spell.Cast("Saber Throw", ret => !RotationRuntime.MovementDisabled && Core.Player.Target.Distance > .4f && Core.Player.Target.Distance <= 3f),
 
@@ -77,6 +79,10 @@ namespace DefaultCombat.Routines
 
                     //Execute: free/anytime with the Destroyer proc, otherwise sub-30%.
                     Spell.Cast("Hew", ret => Core.Player.HasBuff("Destroyer") || Core.Player.Target.HealthPercent <= 30),
+                    Spell.Cast("Vicious Throw", ret => Core.Player.Target.HealthPercent <= 30),
+
+                    //Safety net if Savagery stack detection is unavailable.
+                    Spell.Cast("Force Scream"),
 
                     //Fillers
                     Spell.Cast("Retaliation"),
@@ -93,11 +99,14 @@ namespace DefaultCombat.Routines
             {
                 return new Decorator(ret => Targeting.ShouldPbaoe,
                     new PrioritySelector(
+                        Spell.Cast("Skewering Strike"),
                         Spell.Cast("Impale"),
                         Spell.Cast("Shatter"),
                         Spell.Cast("Force Scream"),
                         Spell.Cast("Vengeful Slam", ret => Core.Player.Target.Distance <= 0.5f),
-                        Spell.Cast("Sweeping Slash", ret => Core.Player.ActionPoints >= 6)
+                        Spell.Cast("Smash", ret => Core.Player.Target.Distance <= 0.5f),
+                        Spell.Cast("Sweeping Slash", ret => Core.Player.ActionPoints >= 6),
+                        Spell.Cast("Ravage")
                         ));
             }
         }

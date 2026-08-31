@@ -57,6 +57,8 @@ namespace DefaultCombat.Routines
             get
             {
                 return new PrioritySelector(
+                    //Leaping Strike replaces Overhead Slash and doubles as a 10m gap closer.
+                    Spell.Cast("Leaping Strike"),
                     Spell.Cast("Force Leap", ret => CombatHotkeys.EnableCharge && Core.Player.Target.Distance >= 1f),
                     Spell.Cast("Saber Throw", ret => Core.Player.Target.Distance > .4f && Core.Player.Target.Distance <= 3f),
 
@@ -102,6 +104,7 @@ namespace DefaultCombat.Routines
                 return new Decorator(ret => Targeting.ShouldPbaoe,
                     new PrioritySelector(
                         //Get the burns up first, then spread them with Vigilant Thrust
+                        Spell.Cast("Leaping Strike"),
                         Spell.Cast("Overhead Slash"),
                         Spell.Cast("Plasma Brand"),
                         Spell.Cast("Blade Storm"),
