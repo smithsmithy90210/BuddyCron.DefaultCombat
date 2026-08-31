@@ -53,8 +53,6 @@ namespace DefaultCombat.Routines
             get
             {
                 return new PrioritySelector(
-                    //Skewering Strike replaces Impale and doubles as a 10m gap closer.
-                    Spell.Cast("Skewering Strike"),
                     Spell.Cast("Force Charge", ret => CombatHotkeys.EnableCharge && Core.Player.Target.Distance >= 1f),
                     Spell.Cast("Saber Throw", ret => !RotationRuntime.MovementDisabled && Core.Player.Target.Distance > .4f && Core.Player.Target.Distance <= 3f),
 
@@ -70,6 +68,7 @@ namespace DefaultCombat.Routines
                     //Alternate the repeating Impale / Force Scream / Vengeful Slam core with priority
                     //slots. Shatter takes the first open slot and resets Ravage; Ravage is then consumed
                     //in a later slot while multiple bleeds are active.
+                    Spell.Cast("Skewering Strike"), // replaces Impale when selected
                     Spell.Cast("Impale"),
                     Spell.Cast("Shatter"),
                     Spell.Cast("Force Scream",
@@ -81,8 +80,6 @@ namespace DefaultCombat.Routines
                     Spell.Cast("Hew", ret => Core.Player.HasBuff("Destroyer") || Core.Player.Target.HealthPercent <= 30),
                     Spell.Cast("Vicious Throw", ret => Core.Player.Target.HealthPercent <= 30),
 
-                    //Safety net if Savagery stack detection is unavailable.
-                    Spell.Cast("Force Scream"),
 
                     //Fillers
                     Spell.Cast("Retaliation"),
@@ -105,8 +102,8 @@ namespace DefaultCombat.Routines
                         Spell.Cast("Force Scream"),
                         Spell.Cast("Vengeful Slam", ret => Core.Player.Target.Distance <= 0.5f),
                         Spell.Cast("Smash", ret => Core.Player.Target.Distance <= 0.5f),
-                        Spell.Cast("Sweeping Slash", ret => Core.Player.ActionPoints >= 6),
-                        Spell.Cast("Ravage")
+                        Spell.Cast("Ravage"),
+                        Spell.Cast("Sweeping Slash", ret => Core.Player.ActionPoints >= 6)
                         ));
             }
         }

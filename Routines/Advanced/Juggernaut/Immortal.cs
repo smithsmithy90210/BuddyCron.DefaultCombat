@@ -66,9 +66,6 @@ namespace DefaultCombat.Routines
                     //Interrupts
                     Spell.Cast("Disruption", ret => Core.Player.Target.IsCasting && CombatHotkeys.EnableInterrupts),
 
-                    //Retaliation is off the global cooldown; consume it before the main rotation.
-                    Spell.Cast("Retaliation"),
-
                     //Rotation - Crushing Blow and Force Scream are the hard hitters (Force Scream also
                     //grants the Sonic Barrier absorb shield). Aegis Assault is the Rage builder and
                     //keeps the damage-reduction/absorb buff up, which also makes Crushing Blow cleave.
@@ -76,13 +73,12 @@ namespace DefaultCombat.Routines
                     Spell.Cast("Force Scream"),
                     Spell.Cast("Aegis Assault", ret => Core.Player.ActionPoints <= 8 || !Core.Player.HasBuff("Aegis Assault")),
                     Spell.Cast("Ravage"),
-                    Spell.Cast("Backhand",
-                        ret => !Core.Player.Target.BossOrGreater() && !Core.Player.Target.IsStunned &&
-                               Core.Player.Target.Distance <= 0.5f),
+                    Spell.Cast("Backhand", ret => !Core.Player.Target.IsStunned),
                     Spell.Cast("Vicious Throw", ret => Core.Player.Target.HealthPercent <= 30),
                     Spell.Cast("Smash", ret => Targeting.ShouldPbaoe),
 
                     //Fillers
+                    Spell.Cast("Retaliation"),
                     Spell.Cast("Vicious Slash", ret => Core.Player.ActionPoints >= 9),
                     Spell.Cast("Assault")
                     );
@@ -95,12 +91,13 @@ namespace DefaultCombat.Routines
             {
                 return new Decorator(ret => Targeting.ShouldPbaoe,
                     new PrioritySelector(
-                        //Aegis Assault enables Crushing Blow's cleave; establish it first.
-                        Spell.Cast("Aegis Assault", ret => Core.Player.ActionPoints <= 8 || !Core.Player.HasBuff("Aegis Assault")),
-                        Spell.Cast("Retaliation"),
+                        //Aegis Assault enables Crushing Blow's cleave; establish the buff first.
+                        Spell.Cast("Aegis Assault", ret => !Core.Player.HasBuff("Aegis Assault")),
                         Spell.Cast("Crushing Blow"),
                         Spell.Cast("Smash"),
                         Spell.Cast("Force Scream"),
+                        Spell.Cast("Aegis Assault", ret => Core.Player.ActionPoints <= 8),
+                        Spell.Cast("Retaliation"),
                         Spell.Cast("Sweeping Slash", ret => Core.Player.ActionPoints >= 6)
                         ));
             }

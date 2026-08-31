@@ -57,8 +57,6 @@ namespace DefaultCombat.Routines
             get
             {
                 return new PrioritySelector(
-                    //Leaping Strike replaces Overhead Slash and doubles as a 10m gap closer.
-                    Spell.Cast("Leaping Strike"),
                     Spell.Cast("Force Leap", ret => CombatHotkeys.EnableCharge && Core.Player.Target.Distance >= 1f),
                     Spell.Cast("Saber Throw", ret => Core.Player.Target.Distance > .4f && Core.Player.Target.Distance <= 3f),
 
@@ -74,6 +72,7 @@ namespace DefaultCombat.Routines
                     //Alternate the repeating Overhead Slash / Blade Storm / Vigilant Thrust core with
                     //priority slots. Plasma Brand takes the first open slot and resets Blade Barrage;
                     //Blade Barrage is then consumed in a later slot while multiple burns are active.
+                    Spell.Cast("Leaping Strike"), // replaces Overhead Slash when selected
                     Spell.Cast("Overhead Slash"),
                     Spell.Cast("Plasma Brand"),
                     Spell.Cast("Blade Storm", ret => Core.Player.BuffCount("Force Rush") >= 2 || Core.Player.Level < 40),
